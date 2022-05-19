@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scroll Demo</title>
+    <!-- 引入react核心库 -->
+    <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <!-- 引入react-dom，用于支持react操作DOM -->
+    <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <!-- 引入babel，用于将jsx转为js -->
+    <script type="text/javascript" src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        .list {
+            width: 200px;
+            height: 150px;
+            background-color: skyblue;
+            overflow: auto;
+        }
+
+        .news {
+            height: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app"></div>
+
+    <script type="text/babel"> /* 此处一定要写babel */
+        class ReactScroll extends React.Component {
+            constructor(props) {
+                super(props)
+                this.state = { newsList: [] }
+                this.listRef = React.createRef();
+            }
+
+            componentDidMount() {
+                this.interval = setInterval(() => {
+                    const { newsList } = this.state
+                    const newsEle = 'News' + newsList.length
+                    this.setState({ newsList: [newsEle, ...newsList] })
+                }, 1000)
+            }
+
+            getSnapshotBeforeUpdate(prevProps, prevState) {
+                return this.listRef.current.scrollHeight
+            }
+
+            componentDidUpdate(prevProps, prevState, snapshot) {
+                this.listRef.current.scrollTop += this.listRef.current.scrollHeight - snapshot;
+            }
+
+            stopRefreshNews = () => {
+                clearInterval(this.interval)
+            }
+
+            render() {
+
+                return (
+                    <div>
+                        <div className="list" ref={this.listRef}>
+                            {
+                                this.state.newsList.map((ele, index) => {
+                                    return <div className="news" key={index}>{ele}</div>
+                                })
+                            }
+                        </div>
+                        <button onClick={this.stopRefreshNews}>Stop</button>
+                    </div>
+                )
+            }
+        }
+        ReactDOM.render(<ReactScroll />, document.getElementById('app'))
+
+    </script>
+</body>
+
+</html>

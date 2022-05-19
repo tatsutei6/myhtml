@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>hello_react</title>
+</head>
+
+<body>
+<!-- 准备好一个“容器” -->
+<div id="app"></div>
+
+<!-- 引入react核心库 -->
+<script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+<!-- 引入react-dom，用于支持react操作DOM -->
+<script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+<!-- 引入babel，用于将jsx转为js -->
+<script type="text/javascript" src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<script type="text/babel"> /* 此处一定要写babel */
+//1.创建虚拟DOM
+const VDOM1 = (<h1 style={{color: 'red'}}>Hello,React</h1>) /* 此处一定不要写引号，因为不是字符串 */
+const VDOM2 = React.createElement('h1', {id: 'title'}, 'Hello,React')
+//2.渲染虚拟DOM到页面
+const data = ['vue', 'react']
+const isShow = true
+const VDOM3 = (
+    <div>
+        <h1>JS Study</h1>
+        {isShow && <div>hello</div>}
+    </div>
+)
+
+function VDOM4() {
+    return <h2>Function VDOM4</h2>
+}
+
+// 函数式组件
+function VDOM5() {
+    // this:undefined，经过babel编译后，默认开启strict模式，在严格模式下，禁止this自动绑定window
+    console.log('this:', this)
+    return <h2>Function VDOM5</h2>
+}
+
+// 函数式组件带参数
+function VDOM6(props) {
+    // this:undefined，经过babel编译后，默认开启strict模式，在严格模式下，禁止this自动绑定window
+    return (
+        <ul>
+            <li>Name:{props.name}</li>
+            <li>Age:{props.age}</li>
+        </ul>
+    )
+}
+
+class VDOM7 extends React.Component {
+    myRef1 = React.createRef()
+    myRef2 = React.createRef()
+
+    showData1 = () => {
+        alert(this.myRef1.current.value)
+    }
+
+    render() {
+        return (
+            <div>
+                <label>
+                    <input ref={this.myRef1} type="text"/>
+                </label>
+            </div>
+        )
+    }
+}
+
+class Counter extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = {count: 1}
+    }
+
+    add = () => {
+        this.setState({count: this.state.count + 1})
+    }
+
+    force = () => {
+        this.forceUpdate()
+    }
+
+    shouldComponentUpdate(nextProps, nextState, nextContext) {
+        console.log('shouldComponentUpdate')
+        return true
+    }
+
+    getSnapshotBeforeUpdate(prevProps, prevState) {
+        console.log("getSnapshotBeforeUpdate")
+        return prevState
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        console.log('componentDidUpdate')
+    }
+
+    render() {
+        return (
+            <div>
+                <button onClick={this.add}>Add</button>
+                <br/>
+                <button onClick={this.force}>Force Update</button>
+                <br/>
+                <span>{this.state.count}</span>
+            </div>
+        )
+    }
+}
+
+class Father extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {carName: 'Bench'}
+    }
+
+    changeCarName = () => {
+        this.setState({carName: 'BMW'})
+    }
+
+    render() {
+        return (
+            <div>
+                <p>FatherComponent Works</p>
+                <button onClick={this.changeCarName}>ChangeCarName</button>
+                {/*因为在getDerivedStateFromProps中指定了{carName: 'Bench2'}，所以在这里会一直显示Bench2*/}
+                <p>{this.state.carName}</p>
+                <Child carName={"BMW"}></Child>
+            </div>
+        )
+    }
+}
+
+class Child extends React.Component {
+    componentWillReceiveProps(nextProps, nextContext) {
+        // 即使在父组件中传入的为"BMW"常量值，只要父组件第二次渲染时，仍然会调用该方法
+        console.log('componentWillReceiveProps')
+    }
+
+    render() {
+        return (
+            <div>
+                {/*getDerivedStateFromProps中将props的值赋值给state*/}
+                Child:{this.state.carName}
+            </div>
+        )
+    }
+}
+
+class FatherNewLifeCycle extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {carName: 'Benz'}
+    }
+
+    changeCarName = () => {
+        if (this.state.carName === 'Benz') {
+            this.setState({carName: 'BMW'})
+        } else {
+            this.setState({carName: 'Benz'})
+        }
+    }
+
+    // 返回的值将作为state
+    static getDerivedStateFromProps(props, state) {
+        console.log('getDerivedStateFromProps')
+        return state
+    }
+
+    render() {
+        return (
+            <div>
+                <p>FatherComponent Works</p>
+                <button onClick={this.changeCarName}>ChangeCarName</button>
+                {/*因为在getDerivedStateFromProps中指定了{carName: 'Bench2'}，所以在这里会一直显示Bench2*/}
+                <p>{this.state.carName}</p>
+                <ChildNewLifeCycle carName={this.state.carName}></ChildNewLifeCycle>
+            </div>
+        )
+    }
+}
+
+class ChildNewLifeCycle extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {}
+    }
+
+    // 返回的值将作为state
+    static getDerivedStateFromProps(props, state) {
+        console.log('getDerivedStateFromProps')
+        return props
+    }
+
+    // 在更新之前获取快照
+    getSnapshotBeforeUpdate(prevProps, prevState) {
+        console.log('getSnapshotBeforeUpdate')
+        console.log('getSnapshotBeforeUpdate.prevProps:', prevProps)
+        console.log('getSnapshotBeforeUpdate.prevState:', prevState)
+        return prevProps
+    }
+
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        console.log('componentDidUpdate')
+        console.log('componentDidUpdate.prevState:', prevState)
+        console.log('componentDidUpdate.prevProps:', prevProps)
+        console.log('componentDidUpdate.snapshot:', snapshot)
+
+    }
+
+    render() {
+        return (
+            <div>
+                {/*getDerivedStateFromProps中将props的值赋值给state*/}
+                ChildNewLifeCycle:{this.props.carName}
+            </div>
+        )
+    }
+}
+
+
+ReactDOM.render(<FatherNewLifeCycle/>, document.getElementById('app'))
+
+</script>
+</body>
+
+</html>

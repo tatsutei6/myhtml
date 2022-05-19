@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Diff Demo</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scroll Demo</title>
+    <!-- 引入react核心库 -->
+    <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <!-- 引入react-dom，用于支持react操作DOM -->
+    <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <!-- 引入babel，用于将jsx转为js -->
+    <script type="text/javascript" src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+<div id="app"></div>
+<script type="text/babel">
+    class PersonList extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state = {personList: []}
+        }
+
+        add = () => {
+            const id = this.state.personList.length + 1;
+            this.setState({personList: [{id, name: 'jack' + id}, ...this.state.personList]})
+        }
+
+        render() {
+            return (
+                <div>
+                    <button onClick={this.add}>Add</button>
+                    {
+                        this.state.personList.map((p, index) => {
+                            return <li key={p.id}>{p.name}</li>
+                        })
+                    }
+                </div>
+            )
+        }
+    }
+
+    ReactDOM.render(<PersonList/>, document.getElementById('app'))
+
+</script>
+</body>
+</html>

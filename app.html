@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App</title>
+</head>
+
+<body>
+    <script>
+        function show() {
+            var a = 3
+            console.log('a', a)
+        }
+        show()
+        // 无法访问a，Uncaught ReferenceError: a is not defined
+        // console.log('out.a', a)
+        // out.b undefined
+        console.log('out.b', b)
+        var b = 5;
+
+        (function () {
+            var a = 1
+            function test() {
+                console.log(++a);
+            }
+            window.$ = function () {
+                return {
+                    test: test
+                }
+            }
+        })()
+        window.$().test()
+
+        function Person(name) {
+            console.log('Person().this', this)
+            this.name = name
+        }
+
+        class Person2 {
+            constructor(name) {
+                console.log('Person2().this', this)
+                this.name = name
+            }
+        }
+        Person("jack")
+        const p1 = Person("jack")
+
+        new Person("jack2")
+        const p2 = new Person("jack2")
+
+        new Person2("jack3")
+        const p3 = new Person2("jack3")
+    </script>
+</body>
+
+</html>
